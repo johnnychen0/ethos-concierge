@@ -55,11 +55,15 @@ def get_application_status(user_id):
     return APPLICATIONS.get(user_id, {"stage": "none"})
 
 
+# Fictitious-but-realistic product names for the demo (not real Ethos products)
+PLAN_NAMES = {"term": "Ethos SmartTerm", "whole": "Ethos Lifelong Whole Life"}
+
+
 def get_plan_options(state):
     """Products available in the user's state (compliance: state-specific)."""
     return [
-        {"plan_type": "term",  "term_lengths": [10, 20, 30], "coverage_range": [100000, 2000000]},
-        {"plan_type": "whole", "term_lengths": None,         "coverage_range": [25000, 1000000]},
+        {"plan_type": "term",  "name": PLAN_NAMES["term"],  "term_lengths": [10, 20, 30], "coverage_range": [100000, 2000000]},
+        {"plan_type": "whole", "name": PLAN_NAMES["whole"], "term_lengths": None,         "coverage_range": [25000, 1000000]},
     ]
 
 
@@ -73,6 +77,7 @@ def get_quote(age, coverage, term_length, plan_type):
     monthly = round(monthly, 2)
     return {
         "plan_type": plan_type,
+        "plan_name": PLAN_NAMES.get(plan_type, plan_type),
         "coverage": coverage,
         "term_length": term_length,
         "monthly_premium": monthly,
@@ -94,5 +99,8 @@ def submit_application(user_id, plan_type, coverage, term_length):
 
 
 def escalate_to_human(context_package):
-    """Hand off to a licensed human, passing the full context package."""
-    return {"ticket_id": "ESC-7791", "queue": "licensed_agents", "eta_minutes": 4}
+    """Queue a callback from a licensed human rep. NOT emergency dispatch."""
+    return {"ticket_id": "ESC-7791", "queue": "licensed_agents",
+            "channel": "phone/chat callback", "callback_eta_minutes": 4,
+            "note": "A licensed Ethos rep will follow up by phone or chat. "
+                    "This is NOT emergency dispatch or a visit to the user's location."}

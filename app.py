@@ -112,20 +112,25 @@ if not st.session_state.display:
 
 # ── Render conversation ─────────────────────────────────────────────────────
 AVATARS = {"assistant": "ethos_mark.png", "user": None}
+
+def render_md(text):
+    # Escape $ so Streamlit doesn't read "$500 ... $56" as a LaTeX math block.
+    st.markdown(text.replace("$", "\\$"))
+
 for m in st.session_state.display:
     with st.chat_message(m["role"], avatar=AVATARS[m["role"]]):
-        st.markdown(m["content"])
+        render_md(m["content"])
 
 # ── Handle new user message ─────────────────────────────────────────────────
 if prompt := st.chat_input("Type your message…"):
     st.session_state.display.append({"role": "user", "content": prompt})
     st.session_state.api_messages.append({"role": "user", "content": prompt})
     with st.chat_message("user", avatar=AVATARS["user"]):
-        st.markdown(prompt)
+        render_md(prompt)
     with st.chat_message("assistant", avatar=AVATARS["assistant"]):
         with st.spinner("…"):
             reply = get_reply()
-        st.markdown(reply)
+        render_md(reply)
     st.session_state.display.append({"role": "assistant", "content": reply})
 
 # ── Sidebar: tool calls (educational) ───────────────────────────────────────

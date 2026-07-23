@@ -73,8 +73,10 @@ html, body, .stMarkdown, p, li, span, div { font-family:'Inter',-apple-system,sa
 .eh-sub { color:#3F4A47; font-size:1.02rem; line-height:1.65; max-width:58ch; }
 .eh-label { font-size:.72rem; letter-spacing:.13em; font-weight:700; color:#272727;
             text-transform:uppercase; margin:1.7rem 0 .6rem; }
-.eh-protect { background:#EDF7F1; border-radius:12px; padding:26px; text-align:center; }
-.eh-protect div { margin-top:6px; font-size:.92rem; color:#1E2A28; font-weight:500; }
+.eh-protect-row { display:flex; align-items:center; gap:14px; margin:1.6rem 0 .2rem; }
+.eh-protect-row .eh-label { margin:0; }
+.eh-badge { display:inline-flex; align-items:center; gap:8px; background:#EDF7F1; color:#05594F;
+  font-weight:600; font-size:.88rem; padding:7px 16px; border-radius:99px; }
 
 .eh-choice { display:flex; gap:16px; margin:1.5rem 0 .4rem; flex-wrap:wrap; }
 .eh-card { flex:1 1 270px; background:#FFFFFF; border:1px solid #E7E4DB; border-radius:14px;
@@ -99,21 +101,33 @@ html, body, .stMarkdown, p, li, span, div { font-family:'Inter',-apple-system,sa
 .eh-foot { margin-top:2.4rem; padding-top:1rem; border-top:1px solid #EEEBE2; font-size:.75rem;
            color:#8A948F; text-align:center; }
 
-/* ── chat ── */
-.eh-chat-sub { display:flex; align-items:center; gap:8px; color:#5B6B66; font-size:.88rem; margin:2px 0 16px; }
+/* ── chat (support-widget style: one clean surface, tight bubbles) ── */
+.eh-chat-sub { display:flex; align-items:center; gap:8px; color:#5B6B66; font-size:.85rem; margin:2px 0 18px; }
 .eh-dot { width:8px; height:8px; border-radius:50%; background:#2BB673; display:inline-block; }
-[data-testid="stChatMessage"] { border-radius:16px; padding:14px 18px; margin-bottom:10px;
-  border:1px solid #ECEAE2; background:#FFFFFF; box-shadow:0 1px 3px rgba(0,0,0,.04); }
-[data-testid="stChatMessage"] p, [data-testid="stChatMessage"] li { line-height:1.6; color:#272727; }
+
+[data-testid="stChatMessage"] { background:transparent; border:none; box-shadow:none;
+  padding:2px 0; margin:0 0 10px; gap:10px; }
+[data-testid="stChatMessage"] p, [data-testid="stChatMessage"] li { line-height:1.55; font-size:.95rem; }
+
+/* assistant: light-gray bubble, left, hugging content */
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) > div:last-child {
+  background:#F2F4F3; border-radius:16px 16px 16px 6px; padding:10px 14px;
+  width:fit-content; max-width:72%; }
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) p { color:#1E2A28; }
+[data-testid="stChatMessageAvatarAssistant"] { background:transparent !important; width:26px; height:26px; }
+[data-testid="stChatMessageAvatarAssistant"] img { border-radius:50%; width:26px; height:26px; }
+
+/* user: brand-green bubble, right, no avatar (iMessage-style) */
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
-  background:#05594F; border-color:#05594F; flex-direction:row-reverse;
-  margin-left:auto; max-width:85%; }
+  flex-direction:row-reverse; }
+[data-testid="stChatMessageAvatarUser"] { display:none !important; }
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) > div:last-child {
+  background:#05594F; border-radius:16px 16px 6px 16px; padding:10px 14px;
+  width:fit-content; max-width:72%; margin-left:auto; }
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) * { color:#FFFFFF !important; }
-[data-testid="stChatMessageAvatarAssistant"] { background:transparent !important; }
-[data-testid="stChatMessageAvatarAssistant"] img { border-radius:50%; }
-[data-testid="stChatMessageAvatarUser"] { background:#59F8B1 !important; color:#05594F !important; }
-[data-testid="stChatInput"] { border-radius:14px; border:1px solid #D9D6CC; background:#FFFFFF;
-  box-shadow:0 2px 8px rgba(0,0,0,.05); }
+
+[data-testid="stChatInput"] { border-radius:22px; border:1px solid #E1DFD6; background:#FFFFFF;
+  box-shadow:0 2px 10px rgba(0,0,0,.06); }
 [data-baseweb="textarea"]:focus-within { border-color:#05594F !important; }
 section[data-testid="stSidebar"] { background:#FFFFFF; border-right:1px solid #ECEAE2; }
 section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 { color:#05594F; font-family:'Fraunces',serif; }
@@ -131,27 +145,27 @@ view = st.query_params.get("view", "home")
 if view == "home":
     st.markdown(TOPBAR + f"""
 <a class="eh-back" href="./" target="_self">&larr; Back</a>
-<div class="eh-h1">Term life insurance sounds like a good&nbsp;fit!</div>
+<div class="eh-h1">Term life insurance may be a great fit for&nbsp;you</div>
 <div class="eh-sub">A Term Life policy helps cover your financial obligations, like debt and
 children's tuition, for a set period of time (term) at a fixed monthly price.</div>
 
-<div class="eh-label">Protection for</div>
-<div class="eh-protect">{I_COUPLE}<div>Spouse or partner</div></div>
+<div class="eh-protect-row"><span class="eh-label">Protection for</span>
+  <span class="eh-badge">{icon('<circle cx="18" cy="16" r="6"/><path d="M6 40c0-7 5-11 12-11s12 4 12 11"/><circle cx="33" cy="18" r="5"/><path d="M29 40c.6-5.5 4-8.5 9-8.5 4 0 7 2 8.5 5.5"/>', 18)} Spouse or partner</span></div>
 
-<div class="eh-label">How would you like to continue?</div>
+<div class="eh-label">How would you like to continue your application?</div>
 <div class="eh-choice">
   <div class="eh-card">
-    <h3>Do it myself</h3>
-    <p>Breeze through the online application at your own pace. Most people finish
-       in about 10 minutes.</p>
-    <a class="eh-btn eh-btn-dark" href="?view=diy" target="_self">Continue my application</a>
+    <h3>Complete application myself</h3>
+    <p>Breeze through the application at your own pace. Most people finish in
+       10 minutes or less.</p>
+    <a class="eh-btn eh-btn-dark" href="?view=diy" target="_self">Continue application</a>
   </div>
   <div class="eh-card">
     <span class="eh-pill">NEW</span>
-    <h3>Talk it through first</h3>
-    <p>Chat with our concierge about fit, price, and coverage — get answers,
-       then apply when you're ready. No pressure.</p>
-    <a class="eh-btn eh-btn-mint" href="?view=chat" target="_self">Chat with the concierge</a>
+    <h3>Chat with our concierge</h3>
+    <p>Chat with our concierge about fit, price, and coverage. Then apply when
+       you're ready.</p>
+    <a class="eh-btn eh-btn-mint" href="?view=chat" target="_self">Chat with concierge</a>
   </div>
 </div>
 <div class="eh-micro">The concierge is an AI assistant &middot; a licensed human is available anytime.</div>
@@ -232,6 +246,12 @@ else:
         # Escape $ so Streamlit doesn't read "$500 ... $56" as a LaTeX math block.
         st.markdown(text.replace("$", "\\$"))
 
+    # Single render path: messages are ONLY ever drawn from session state, and each
+    # state change triggers st.rerun(). Rendering new messages inline AND from state
+    # is what caused the faded duplicate-message ghost during slow LLM calls.
+    st.markdown("<style>.stApp{background:#FFFFFF}.block-container{max-width:680px}</style>",
+                unsafe_allow_html=True)
+
     if not st.session_state.display:
         with st.spinner("…"):
             st.session_state.display.append({"role": "assistant", "content": get_reply()})
@@ -244,13 +264,14 @@ else:
     if prompt := st.chat_input("Ask about coverage, price, or picking up your application…"):
         st.session_state.display.append({"role": "user", "content": prompt})
         st.session_state.api_messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user", avatar=AVATARS["user"]):
-            render_md(prompt)
+        st.rerun()
+
+    if st.session_state.display and st.session_state.display[-1]["role"] == "user":
         with st.chat_message("assistant", avatar=AVATARS["assistant"]):
             with st.spinner("…"):
                 reply = get_reply()
-            render_md(reply)
         st.session_state.display.append({"role": "assistant", "content": reply})
+        st.rerun()
 
     with st.sidebar:
         st.subheader("Behind the scenes")
